@@ -43,4 +43,6 @@ endif
 LINKER_SCRIPT := gcc_arm.ld
 CLEAN_FILES += $(LINKER_SCRIPT)
 
+-include ../../../applications/vehicle/vehicle.mk
+-include ../../../middleware/rpmsg-lite/rpmsg-lite.mk
 include ../../common/GCC/Cortex-A.mk
