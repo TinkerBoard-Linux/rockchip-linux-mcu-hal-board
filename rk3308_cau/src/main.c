@@ -71,9 +71,10 @@ int main(void)
     HAL_App_Init();
 
     while (1) {
-        ;
-        asm volatile ("wfi");
-        ;
+        /* TODO: Message loop */
+
+        /* Enter cpu idle when no message */
+        HAL_CPU_EnterIdle();
     }
 
     return 0;
