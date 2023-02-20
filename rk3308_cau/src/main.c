@@ -6,6 +6,7 @@
 #include "hal_bsp.h"
 #include "hal_base.h"
 #include "hal_define.h"
+#include "rpmsg_base.h"
 #include "board.h"
 
 extern void _start(void);
@@ -58,6 +59,13 @@ int main(void)
 
     /* Board Init */
     Board_Init();
+
+    /* RPMSG Init */
+#ifdef PRIMARY_CPU
+    rpmsg_master_init();
+#else
+    rpmsg_remote_init();
+#endif
 
     printf("\n");
     printf("****************************************\n");
