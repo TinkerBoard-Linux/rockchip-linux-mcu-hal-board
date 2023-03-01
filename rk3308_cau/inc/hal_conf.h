@@ -53,4 +53,13 @@
 #define HAL_SNOR_SFC_HOST
 #endif
 
+/* HAL USING CONFIG */
+/*
+ * RPMsg config
+ */
+#define HAL_USING_RPMSG_LITE
+#ifdef HAL_USING_RPMSG_LITE
+#define HAL_USING_RPMSG_CMD
+#endif
+
 #endif

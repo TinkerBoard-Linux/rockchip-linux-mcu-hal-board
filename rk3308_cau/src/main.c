@@ -38,13 +38,10 @@ static void SPINLOCK_Init(void)
 #endif
 }
 
-HAL_WEAK void HAL_App_Init(void)
-{
-
-}
-
 int main(void)
 {
+    int32_t ret;
+
     /* HAL BASE Init */
     HAL_Init();
 
@@ -72,10 +69,16 @@ int main(void)
     rk_printf(" CPU(%lu) Initial OK!\n", HAL_CPU_TOPOLOGY_GetCurrentCpuId());
     printf("\n");
 
-    HAL_App_Init();
+#ifdef HAL_USING_RPMSG_CMD
+    rpmsg_cmd_init(NULL);
+#endif
 
     while (1) {
         /* TODO: Message loop */
+#ifdef HAL_USING_RPMSG_CMD
+        ret = rpmsg_cmd_process(NULL);
+        HAL_ASSERT(ret == HAL_OK);
+#endif
 
         /* Enter cpu idle when no message */
         HAL_CPU_EnterIdle();
