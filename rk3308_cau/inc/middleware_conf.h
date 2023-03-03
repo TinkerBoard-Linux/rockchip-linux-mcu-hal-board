@@ -19,14 +19,29 @@
 
 /* RPMSG ID Define */
 /* RPMSG master(cpu1) to remote(cpu2) endpoint index define */
-#define EPT_M1R2_INIT  0UL
+#define EPT_M1R2_INIT   0UL
+#define EPT_M1R2_SYSCMD 1UL
 
 /* RPMSG master(cpu1) to remote(cpu3) endpoint index define */
-#define EPT_M1R2_INIT  0UL
+#define EPT_M1R3_INIT   0UL
+#define EPT_M1R3_SYSCMD 1UL
 
 /* RPMSG master(cpu1) to remote(cpu0) endpoint index define */
-#define EPT_M1R0_INIT  0UL
-#define EPT_M1R0_ECNR  1UL
+#define EPT_M1R0_INIT   0UL
+#define EPT_M1R0_SYSCMD 1UL
+#define EPT_M1R0_ECNR   2UL
+
+/* RPMSG data base format */
+struct rpmsg_cmd_fmt_t {
+    uint32_t cmd;
+    void *addr;
+};
+typedef struct rpmsg_cmd_fmt_t rpmsg_fmt_t;
+
+/* Type define of rpmsg_base_fmt_t */
+#define RPMSG_TYPE_DIRECT 1UL
+#define RPMSG_TYPE_WORK   2UL
+#define RPMSG_TYPE_QUERY  3UL
 
 /* RPMSG API Functions */
 void rpmsg_init(void);
