@@ -80,6 +80,10 @@ int main(void)
         HAL_ASSERT(ret == HAL_OK);
 #endif
 
+#ifdef HAL_USING_AUPIPE_APP
+        ret = aupipe_launch(NULL);
+        HAL_ASSERT(ret == HAL_OK);
+#endif
         /* Enter cpu idle when no message */
         HAL_CPU_EnterIdle();
     }

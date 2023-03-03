@@ -62,4 +62,6 @@
 #define HAL_USING_RPMSG_CMD
 #endif
 
+#define HAL_USING_AUPIPE_APP
+
 #endif
