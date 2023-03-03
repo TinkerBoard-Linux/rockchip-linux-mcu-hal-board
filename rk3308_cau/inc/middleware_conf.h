@@ -19,13 +19,14 @@
 
 /* RPMSG ID Define */
 /* RPMSG master(cpu1) to remote(cpu2) endpoint index define */
-#define EPT_M1R2_INIT 0UL
+#define EPT_M1R2_INIT  0UL
 
 /* RPMSG master(cpu1) to remote(cpu3) endpoint index define */
-#define EPT_M1R2_INIT 0UL
+#define EPT_M1R2_INIT  0UL
 
 /* RPMSG master(cpu1) to remote(cpu0) endpoint index define */
-#define EPT_M1R0_INIT 0UL
+#define EPT_M1R0_INIT  0UL
+#define EPT_M1R0_ECNR  1UL
 
 /* RPMSG API Functions */
 void rpmsg_init(void);
