@@ -60,14 +60,14 @@ int main(void)
     /* RPMSG Init */
     rpmsg_init();
 
-    printf("\n");
-    printf("****************************************\n");
-    printf("  Hello RK3308 Bare-metal using RK_HAL! \n");
-    printf("   Fuzhou Rockchip Electronics Co.Ltd   \n");
-    printf("              CPI_ID(%lu)               \n", HAL_CPU_TOPOLOGY_GetCurrentCpuId());
-    printf("****************************************\n");
+    rk_printf("\n");
+    rk_printf("****************************************\n");
+    rk_printf("  Hello RK3308 Bare-metal using RK_HAL! \n");
+    rk_printf("   Fuzhou Rockchip Electronics Co.Ltd   \n");
+    rk_printf("              CPI_ID(%lu)               \n", HAL_CPU_TOPOLOGY_GetCurrentCpuId());
+    rk_printf("****************************************\n");
     rk_printf(" CPU(%lu) Initial OK!\n", HAL_CPU_TOPOLOGY_GetCurrentCpuId());
-    printf("\n");
+    rk_printf("\n");
 
 #ifdef HAL_USING_RPMSG_CMD
     rpmsg_cmd_init(NULL);

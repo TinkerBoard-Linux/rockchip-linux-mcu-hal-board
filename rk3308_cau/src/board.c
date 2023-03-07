@@ -103,28 +103,75 @@ int fputc(int ch, FILE *f)
 }
 #endif
 
-static char printf_buf[512];
+#ifdef HAL_USING_LOGBUFFER
+#if defined(CPU0)
+#define LOG_MEM_BASE ((uint32_t)&__share_log0_start__)
+#define LOG_MEM_END  ((uint32_t)&__share_log0_end__)
+#elif defined(PRIMARY_CPU)
+#define LOG_MEM_BASE ((uint32_t)&__share_log1_start__)
+#define LOG_MEM_END  ((uint32_t)&__share_log1_end__)
+#elif defined(CPU2)
+#define LOG_MEM_BASE ((uint32_t)&__share_log2_start__)
+#define LOG_MEM_END  ((uint32_t)&__share_log2_end__)
+#elif defined(CPU3)
+#define LOG_MEM_BASE ((uint32_t)&__share_log3_start__)
+#define LOG_MEM_END  ((uint32_t)&__share_log3_end__)
+#else
+#error "error: Undefined CPU id!"
+#endif
+
+static struct ringbuffer_t log_buffer, *plog_buf = NULL;
+void log_buffer_init(void)
+{
+    ringbuffer_init(&log_buffer, (uint8_t *)LOG_MEM_BASE, (int16_t)(LOG_MEM_END - LOG_MEM_BASE));
+    plog_buf = &log_buffer;
+}
+
+struct ringbuffer_t *get_log_ringbuffer(void)
+{
+    HAL_ASSERT(plog_buf != NULL);
+    return plog_buf;
+}
+#endif
+
 int rk_printf(const char *fmt, ...)
 {
     va_list args;
-    uint64_t cnt64;
-    uint32_t cpu_id, n, sec, ms, us;
-
-    cpu_id = HAL_CPU_TOPOLOGY_GetCurrentCpuId();
-
-    // SYS_TIMER is 24MHz
-    cnt64 = HAL_GetSysTimerCount();
-    us = (uint32_t)((cnt64 / (PLL_INPUT_OSC_RATE / 1000000)) % 1000);
-    ms = (uint32_t)((cnt64 / (PLL_INPUT_OSC_RATE / 1000)) % 1000);
-    sec = (uint32_t)(cnt64 / PLL_INPUT_OSC_RATE);
-    n = snprintf(printf_buf, 512, "[(%d) %d.%d.%d]", cpu_id, sec, ms, us);
+    uint32_t length, outlen;
+    static char hal_log_buf[32 + HAL_CONSOLEBUF_SIZE];
+    char *p_log_str = &hal_log_buf[32];
 
     va_start(args, fmt);
-    vsnprintf(printf_buf + n, 512 - n, fmt, args);
+    length = vsnprintf(p_log_str, HAL_CONSOLEBUF_SIZE - 1, fmt, args);
     va_end(args);
 
+    if (length > HAL_CONSOLEBUF_SIZE - 1)
+        length = HAL_CONSOLEBUF_SIZE - 1;
+
+    p_log_str[HAL_CONSOLEBUF_SIZE - 1] = 0;
+
+
+    outlen = 0;
+    if (p_log_str[strlen(p_log_str) - 1] == '\n')
+    {        
+        uint64_t cnt64;
+        uint32_t cpu_id, sec, ms, us;
+        cpu_id = HAL_CPU_TOPOLOGY_GetCurrentCpuId();
+        cnt64 = HAL_GetSysTimerCount();
+        us = (uint32_t)((cnt64 / (PLL_INPUT_OSC_RATE / 1000000)) % 1000);
+        ms = (uint32_t)((cnt64 / (PLL_INPUT_OSC_RATE / 1000)) % 1000);
+        sec = (uint32_t)(cnt64 / PLL_INPUT_OSC_RATE);
+        outlen = snprintf(hal_log_buf, 32 - 1 , "[(%d)%d.%03d.%03d] ", cpu_id, sec, ms, us);
+    }
+    outlen += snprintf(hal_log_buf + outlen, HAL_CONSOLEBUF_SIZE - 1, "%s", p_log_str);
+
+    /* Save log to buffer */
+#ifdef HAL_USING_LOGBUFFER
+    ringbuffer_put_force(get_log_ringbuffer(), hal_log_buf, outlen);
+#endif
+
     HAL_SPINLOCK_Lock(RK_PRINTF_SPINLOCK_ID);
-    printf("%s", printf_buf);
+    printf("%s", hal_log_buf);
     HAL_SPINLOCK_Unlock(RK_PRINTF_SPINLOCK_ID);
 
     return 0;
@@ -133,6 +180,10 @@ int rk_printf(const char *fmt, ...)
 void Board_Init(void)
 {
     HAL_IODOMAIN_Config();
+
+#ifdef HAL_USING_LOGBUFFER
+    log_buffer_init();
+#endif
 
 #ifdef PRIMARY_CPU
     console_uart_init();

@@ -53,6 +53,8 @@
 #define HAL_SNOR_SFC_HOST
 #endif
 
+#define HAL_CONSOLEBUF_SIZE 128
+
 /* HAL USING CONFIG */
 /*
  * RPMsg config
@@ -62,6 +64,7 @@
 #define HAL_USING_RPMSG_CMD
 #endif
 
+#define HAL_USING_LOGBUFFER
 #define HAL_USING_AUPIPE_APP
 
 #endif

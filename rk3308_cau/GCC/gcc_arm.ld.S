@@ -224,7 +224,7 @@ SECTIONS
         . = ALIGN(64);
         PROVIDE(__share_log3_start__ = .);
         . += SHLOG3_SIZE;
-        PROVIDE(__share_log4_end__ = .);
+        PROVIDE(__share_log3_end__ = .);
         . = ALIGN(64);
     } > SHMEM
 
