@@ -41,6 +41,7 @@ static void SPINLOCK_Init(void)
 int main(void)
 {
     int32_t ret;
+    bool idle_enable;
 
     /* HAL BASE Init */
     HAL_Init();
@@ -74,18 +75,29 @@ int main(void)
 #endif
 
     while (1) {
+
+        idle_enable = true;
+
         /* TODO: Message loop */
 #ifdef HAL_USING_RPMSG_CMD
         ret = rpmsg_cmd_process(NULL);
-        HAL_ASSERT(ret == HAL_OK);
+        HAL_ASSERT((ret == HAL_OK) || (ret == HAL_BUSY));
+        if (ret == HAL_BUSY) {
+            idle_enable = false;
+        }
 #endif
 
 #ifdef HAL_USING_AUPIPE_APP
         ret = aupipe_launch(NULL);
-        HAL_ASSERT(ret == HAL_OK);
+        HAL_ASSERT((ret == HAL_OK) || (ret == HAL_BUSY));
+        if (ret == HAL_BUSY) {
+            idle_enable = false;
+        }
 #endif
         /* Enter cpu idle when no message */
-        HAL_CPU_EnterIdle();
+        if (idle_enable == true) {
+            HAL_CPU_EnterIdle();
+        }
     }
 
     return 0;
