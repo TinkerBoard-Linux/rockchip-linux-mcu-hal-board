@@ -86,14 +86,6 @@ int main(void)
             idle_enable = false;
         }
 #endif
-
-#ifdef HAL_USING_AUPIPE_APP
-        ret = aupipe_launch(NULL);
-        HAL_ASSERT((ret == HAL_OK) || (ret == HAL_BUSY));
-        if (ret == HAL_BUSY) {
-            idle_enable = false;
-        }
-#endif
         /* Enter cpu idle when no message */
         if (idle_enable == true) {
             HAL_CPU_EnterIdle();
