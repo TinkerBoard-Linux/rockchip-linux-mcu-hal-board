@@ -65,6 +65,9 @@
 #endif
 
 #define HAL_USING_LOGBUFFER
-#define HAL_USING_AUPIPE_APP
+
+#if defined(HAL_USING_RPMSG_CMD) && defined(CPU0)
+#define HAL_USING_ECNR_APP
+#endif
 
 #endif

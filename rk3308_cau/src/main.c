@@ -9,6 +9,8 @@
 #include "middleware_conf.h"
 #include "board.h"
 
+#include "rpmsg_app.h"
+
 extern void _start(void);
 
 static struct GIC_AMP_IRQ_INIT_CFG irqsConfig[] = {
@@ -74,6 +76,10 @@ int main(void)
     rpmsg_cmd_init(NULL);
 #endif
 
+#ifdef HAL_USING_ECNR_APP
+    rpmsg_app_init(EPT_M1R0_ECNR, REMOTE_ID_0, RPMSG_ECN);
+#endif
+
     while (1) {
 
         idle_enable = true;
@@ -81,6 +87,13 @@ int main(void)
         /* TODO: Message loop */
 #ifdef HAL_USING_RPMSG_CMD
         ret = rpmsg_cmd_process(NULL);
+        HAL_ASSERT((ret == HAL_OK) || (ret == HAL_BUSY));
+        if (ret == HAL_BUSY) {
+            idle_enable = false;
+        }
+#endif
+#ifdef HAL_USING_ECNR_APP
+        ret = rpmsg_app_process(RPMSG_ECN);
         HAL_ASSERT((ret == HAL_OK) || (ret == HAL_BUSY));
         if (ret == HAL_BUSY) {
             idle_enable = false;
