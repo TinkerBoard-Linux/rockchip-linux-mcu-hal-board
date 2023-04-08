@@ -9,7 +9,14 @@
 #include "board_conf.h"
 #include "board.h"
 
-static struct UART_REG *pUart = CONSOLE_PORT;
+/* Console Uart Port config */
+#if (HAL_CONSOLE == 2)
+#define CONSOLE_PORT UART2
+#define CONSOLE_DEV  g_uart2Dev
+#else //default
+#define CONSOLE_PORT UART4
+#define CONSOLE_DEV  g_uart4Dev
+#endif
 
 static void HAL_IODOMAIN_Config(void)
 {
@@ -39,6 +46,7 @@ static void HAL_IOMUX_Uart4M0Config(void)
 
 static void console_uart_init(void)
 {
+    const struct UART_REG *pUart = CONSOLE_PORT;
     const struct HAL_UART_DEV *p_uartDev = &CONSOLE_DEV;
     struct HAL_UART_CONFIG hal_uart_config = {
         .baudRate = UART_BR_1500000,
@@ -66,6 +74,7 @@ int fputc(int ch, FILE *f);
 #ifdef __GNUC__
 int _write(int fd, char *ptr, int len)
 {
+    const struct UART_REG *pUart = CONSOLE_PORT;
     int i = 0;
 
     /*

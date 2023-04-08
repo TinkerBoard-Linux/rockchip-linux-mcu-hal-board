@@ -6,8 +6,4 @@
 #ifndef _BOARD_CONF_H_
 #define _BOARD_CONF_H_
 
-/* Console Uart Port config */
-#define CONSOLE_PORT UART4
-#define CONSOLE_DEV  g_uart4Dev
-
 #endif
